@@ -53,13 +53,16 @@ class PipelineGenerator:
         """
         return self.project_name.lower().replace(" ", "-").replace("_", "-")
 
-    def generate_pipeline(self, pipeline, image, token):
+    def generate_pipeline(
+        self, pipeline, image, token, pipeline_name: str | None = None
+    ):
         """
         This method return @dsl.pipeline annotated function that contains
         dynamically generated pipelines.
         :param pipeline: kedro pipeline
         :param image: full docker image name
         :param token: mlflow authentication token
+        :param pipeline_name: name of the resulting KFP template
         :return: kfp pipeline function
         """
 
@@ -71,8 +74,11 @@ class PipelineGenerator:
                 dependency_name = clean_name(dependency_group)
                 kfp_tasks[name].after(kfp_tasks[dependency_name])
 
+        if pipeline_name is None:
+            pipeline_name = self.get_pipeline_name()
+
         @dsl.pipeline(
-            name=self.get_pipeline_name(),
+            name=pipeline_name,
             description=self.run_config.description,
         )
         def convert_kedro_pipeline_to_kfp() -> None:

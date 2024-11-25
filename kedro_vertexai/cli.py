@@ -177,8 +177,15 @@ def ui(ctx) -> None:
     default="pipeline.json",
     help="Pipeline JSON definition file.",
 )
+@click.option(
+    "-n",
+    "--name",
+    type=str,
+    default=None,
+    help="Name of the resulting KFP template.",
+)
 @click.pass_context
-def compile(ctx, image, pipeline, output) -> None:
+def compile(ctx, image, pipeline, output, name) -> None:
     """Translates Kedro pipeline into JSON file with VertexAI pipeline definition"""
     context_helper = ctx.obj["context_helper"]
     config = context_helper.config.run_config
@@ -187,6 +194,7 @@ def compile(ctx, image, pipeline, output) -> None:
         pipeline=pipeline,
         image=image if image else config.image,
         output=output,
+        name=name,
     )
 
 

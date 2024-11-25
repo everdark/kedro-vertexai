@@ -97,16 +97,20 @@ class VertexAIPipelinesClient:
         pipeline,
         image,
         output,
+        name: str | None = None,
     ):
         """
         Creates json file in given local output path
         :param pipeline:
         :param image:
         :param output:
+        :param name: name of the resulting KFP template
         :return:
         """
         token = os.getenv("MLFLOW_TRACKING_TOKEN", "")
-        pipeline_func = self.generator.generate_pipeline(pipeline, image, token)
+        pipeline_func = self.generator.generate_pipeline(
+            pipeline, image, token, pipeline_name=name
+        )
         Compiler().compile(
             pipeline_func=pipeline_func,
             package_path=output,
