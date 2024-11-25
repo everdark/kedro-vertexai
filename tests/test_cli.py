@@ -174,6 +174,25 @@ class TestPluginCLI(unittest.TestCase):
             image="img",
             output="output",
             pipeline="pipe",
+            name=None,
+        )
+
+    def test_compile_with_name(self):
+        context_helper: ContextHelper = MagicMock(ContextHelper)
+        context_helper.config = deepcopy(test_config)
+        config = dict(context_helper=context_helper)
+        runner = CliRunner()
+
+        result = runner.invoke(
+            compile, ["-p", "pipe", "-i", "img", "-o", "output", "-n", "test"], obj=config
+        )
+
+        assert result.exit_code == 0
+        context_helper.vertexai_client.compile.assert_called_with(
+            image="img",
+            output="output",
+            pipeline="pipe",
+            name="test",
         )
 
     def test_store_params_empty(self):
