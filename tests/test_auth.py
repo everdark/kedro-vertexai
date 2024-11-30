@@ -1,8 +1,10 @@
+import importlib
 import os
 import unittest
 from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
+import pytest
 import responses
 from google.auth.exceptions import DefaultCredentialsError
 from kedro.framework.context import KedroContext
@@ -141,11 +143,17 @@ class TestAuthHandler(unittest.TestCase):
         iam.return_value.generate_id_token.assert_called_once()
         assert token == mock_token
 
+    @pytest.mark.skipif(
+        not importlib.util.find_spec("mlflow"), reason="requires mlflow"
+    )
     def test_mlflow_header_provider_is_singleton(self):
         provider = DynamicMLFlowRequestHeaderProvider()
         others = [DynamicMLFlowRequestHeaderProvider() for _ in range(100)]
         assert all(provider == o for o in others)
 
+    @pytest.mark.skipif(
+        not importlib.util.find_spec("mlflow"), reason="requires mlflow"
+    )
     def test_mlflow_header_provider_setup(self):
         for in_ctx in (True, False):
             with self.subTest(msg=f"Enabled={in_ctx}"):
@@ -184,6 +192,9 @@ class TestAuthHandler(unittest.TestCase):
             mlflow, rh_class = safe_import_mlflow()
             assert mlflow is None and rh_class is object
 
+    @pytest.mark.skipif(
+        not importlib.util.find_spec("mlflow"), reason="requires mlflow"
+    )
     @patch("kedro_vertexai.auth.gcp.AuthHandler.obtain_iam_token")
     def test_mlflow_header_provider_methods(self, obtain_iam_token):
         token = uuid4().hex
@@ -197,6 +208,9 @@ class TestAuthHandler(unittest.TestCase):
         headers = provider.request_headers()
         self.assertDictEqual(headers, {"Authorization": f"Bearer {token}"})
 
+    @pytest.mark.skipif(
+        not importlib.util.find_spec("mlflow"), reason="requires mlflow"
+    )
     def test_request_header_provider_hook(self):
         provider = MagicMock(spec=RequestHeaderProviderWithKedroContext)
         kedro_context = MagicMock(spec=KedroContext)

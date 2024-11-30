@@ -1,14 +1,22 @@
+import importlib
 import unittest
 from unittest.mock import MagicMock, call, patch
 
-import mlflow
-
+import pytest
 from kedro_vertexai.constants import VERTEXAI_JOB_NAME_TAG, VERTEXAI_RUN_ID_TAG
 from kedro_vertexai.hooks import MlflowTagsHook
 
 from .utils import environment
 
+try:
+    mlflow = importlib.import_module("mlflow")
+except ImportError as err:
+    mlflow = None
 
+
+@pytest.mark.skipif(
+    not importlib.util.find_spec("mlflow"), reason="requires mlflow"
+)
 @patch.object(mlflow, "set_tag")
 class TestMlflowTagsHook(unittest.TestCase):
     def test_should_set_mlflow_tags(self, mlflow_set_tag: MagicMock):
