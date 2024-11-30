@@ -54,7 +54,12 @@ class PipelineGenerator:
         return self.project_name.lower().replace(" ", "-").replace("_", "-")
 
     def generate_pipeline(
-        self, pipeline, image, token, pipeline_name: str | None = None
+        self,
+        pipeline,
+        image,
+        token,
+        pipeline_name: str | None = None,
+        pipeline_desc: str | None = None,
     ):
         """
         This method return @dsl.pipeline annotated function that contains
@@ -63,6 +68,7 @@ class PipelineGenerator:
         :param image: full docker image name
         :param token: mlflow authentication token
         :param pipeline_name: name of the resulting KFP template
+        :param pipeline_desc: description of the resulting KFP template
         :return: kfp pipeline function
         """
 
@@ -79,7 +85,7 @@ class PipelineGenerator:
 
         @dsl.pipeline(
             name=pipeline_name,
-            description=self.run_config.description,
+            description=pipeline_desc or self.run_config.description,
         )
         def convert_kedro_pipeline_to_kfp() -> None:
             from kedro.framework.project import pipelines

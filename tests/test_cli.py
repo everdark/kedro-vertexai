@@ -1,3 +1,4 @@
+import importlib
 import json
 import os
 import unittest
@@ -8,6 +9,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock, Mock, patch
 
+import pytest
 import yaml
 from click.testing import CliRunner
 
@@ -175,6 +177,7 @@ class TestPluginCLI(unittest.TestCase):
             output="output",
             pipeline="pipe",
             name=None,
+            desc=None,
         )
 
     def test_compile_with_name(self):
@@ -184,7 +187,9 @@ class TestPluginCLI(unittest.TestCase):
         runner = CliRunner()
 
         result = runner.invoke(
-            compile, ["-p", "pipe", "-i", "img", "-o", "output", "-n", "test"], obj=config
+            compile,
+            ["-p", "pipe", "-i", "img", "-o", "output", "-n", "test"],
+            obj=config,
         )
 
         assert result.exit_code == 0
@@ -193,6 +198,28 @@ class TestPluginCLI(unittest.TestCase):
             output="output",
             pipeline="pipe",
             name="test",
+            desc=None,
+        )
+
+    def test_compile_with_desc(self):
+        context_helper: ContextHelper = MagicMock(ContextHelper)
+        context_helper.config = deepcopy(test_config)
+        config = dict(context_helper=context_helper)
+        runner = CliRunner()
+
+        result = runner.invoke(
+            compile,
+            ["-p", "pipe", "-i", "img", "-o", "output", "-d", "test"],
+            obj=config,
+        )
+
+        assert result.exit_code == 0
+        context_helper.vertexai_client.compile.assert_called_with(
+            image="img",
+            output="output",
+            pipeline="pipe",
+            name=None,
+            desc="test",
         )
 
     def test_store_params_empty(self):
@@ -375,6 +402,9 @@ class TestPluginCLI(unittest.TestCase):
             with open(on_push_actions, "r") as f:
                 assert "kedro vertexai run-once" in f.read()
 
+    @pytest.mark.skipif(
+        not importlib.util.find_spec("mlflow"), reason="requires mlflow"
+    )
     @patch("mlflow.start_run")
     @patch("mlflow.set_tag")
     @patch("mlflow.get_experiment_by_name")

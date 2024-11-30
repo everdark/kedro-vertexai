@@ -98,6 +98,7 @@ class VertexAIPipelinesClient:
         image,
         output,
         name: str | None = None,
+        desc: str | None = None,
     ):
         """
         Creates json file in given local output path
@@ -109,7 +110,7 @@ class VertexAIPipelinesClient:
         """
         token = os.getenv("MLFLOW_TRACKING_TOKEN", "")
         pipeline_func = self.generator.generate_pipeline(
-            pipeline, image, token, pipeline_name=name
+            pipeline, image, token, pipeline_name=name, pipeline_desc=desc
         )
         Compiler().compile(
             pipeline_func=pipeline_func,
