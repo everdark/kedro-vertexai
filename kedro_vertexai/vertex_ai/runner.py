@@ -33,19 +33,14 @@ class VertexAIPipelinesRunner(SequentialRunner):
         hook_manager: PluginManager = None,
         session_id: str = None,
     ) -> Dict[str, Any]:
-        # FIXME:
-        # If nodes are namespaced, they are not populated into the catalog object,
-        # which means they will appear in 'unsatisfied' and hence the corresponding
-        # datasets will be created. For ibis-bigquery, the resulting dataset is indeed
-        # pickled ibis table expression which can still be used to re-generate the
-        # underlying data. For example:
-        #   conn.execute(table.unbind().count())
-        # However, they are in general redundant and not really used by the pipeline.
-        # A workaround is to generate the resolved version of the Kedro catalog by:
-        #   kedro catalog resolve > final_catalog.yml
-        # and hence we can remove all the redundant entries in 'unsatisfied'.
-        # Again, for ibis-bigquery, the overhead of creating these datasets are
-        # negligible. But it could be a real trouble for other type of datasets.
+        # FIXME: Factory datasets are not populated into the catalog object/
+        # This means they will appear in 'unsatisfied' and hence the corresponding
+        # datasets will be created. This results in overwriting existing datasets.
+        # The current workaround is to do:
+        #   kedro catalog resolve
+        # to create a resolved catalog.yml to replace with factory datasets.
+        #
+        # Issue: https://github.com/kedro-org/kedro/issues/3312
         unsatisfied = (pipeline.inputs() | pipeline.outputs()) - set(catalog.list())
         for ds_name in unsatisfied:
             catalog = catalog.shallow_copy()
