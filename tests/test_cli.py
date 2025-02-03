@@ -176,6 +176,7 @@ class TestPluginCLI(unittest.TestCase):
             image="img",
             output="output",
             pipeline="pipe",
+            params="",
             name=None,
             desc=None,
         )
@@ -197,6 +198,7 @@ class TestPluginCLI(unittest.TestCase):
             image="img",
             output="output",
             pipeline="pipe",
+            params="",
             name="test",
             desc=None,
         )
@@ -218,6 +220,7 @@ class TestPluginCLI(unittest.TestCase):
             image="img",
             output="output",
             pipeline="pipe",
+            params="",
             name=None,
             desc="test",
         )

@@ -6,7 +6,7 @@ import datetime as dt
 import logging
 import os
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from google.cloud import aiplatform as aip
 from google.cloud.aiplatform import PipelineJob
@@ -97,6 +97,7 @@ class VertexAIPipelinesClient:
         pipeline,
         image,
         output,
+        params: list[str] = [],
         name: str | None = None,
         desc: str | None = None,
     ):
@@ -106,11 +107,12 @@ class VertexAIPipelinesClient:
         :param image:
         :param output:
         :param name: name of the resulting KFP template
+        :param params: Pipeline parameters to be specified at run time.
         :return:
         """
         token = os.getenv("MLFLOW_TRACKING_TOKEN", "")
         pipeline_func = self.generator.generate_pipeline(
-            pipeline, image, token, pipeline_name=name, pipeline_desc=desc
+            pipeline, image, token, pipeline_name=name, pipeline_desc=desc, params=params
         )
         Compiler().compile(
             pipeline_func=pipeline_func,

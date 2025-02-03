@@ -11,6 +11,8 @@ didn't alter the remote pipeline execution, and only escaped the local Python pr
 with the proper remote pipeline execution handling, and possibly per-task timeout enabled by [the new kfp feature](https://github.com/kubeflow/pipelines/pull/10481).
 - Assign pipelines to Vertex AI experiments
 - Migrated `pydantic` library to v2
+- Added pipeline parametrization
+- Migrated to `actions/upload-artifact@v4` in the Github Actions
 
 ## [0.11.1] - 2024-07-01
 
@@ -69,7 +71,7 @@ with the proper remote pipeline execution handling, and possibly per-task timeou
 
 ## [0.4.1] - 2022-04-14
 
--   Add missing `initialize-job` for `mlflow-start-run` step, added MLFlowGoogleIAMCredentialsProvider. 
+-   Add missing `initialize-job` for `mlflow-start-run` step, added MLFlowGoogleIAMCredentialsProvider.
 
 ## [0.4.0] - 2022-04-08
 
@@ -80,7 +82,7 @@ with the proper remote pipeline execution handling, and possibly per-task timeou
 ## [0.3.0] - 2022-03-28
 
 -   Fix issues with data catalog namespacing for new spaceflights starter (#19)
--   Add end 2 end tests based on Kedro Spaceflights quickstart guide from our docs.  
+-   Add end 2 end tests based on Kedro Spaceflights quickstart guide from our docs.
 -   Move service account configuration from env variables to config file. (#7)
 -   Refactored config to use `pydantic` for validation instead of homemade code. (#1)
 -   Add `--wait-for-completion` and `--timeout-seconds` parameters to `run-once` command to wait for the Vertex AI job to complete when launched from CLI
