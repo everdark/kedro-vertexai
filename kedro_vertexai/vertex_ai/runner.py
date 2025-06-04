@@ -33,14 +33,12 @@ class VertexAIPipelinesRunner(SequentialRunner):
         hook_manager: PluginManager = None,
         session_id: str = None,
     ) -> Dict[str, Any]:
-        # FIXME: Factory datasets are not populated into the catalog object/
-        # This means they will appear in 'unsatisfied' and hence the corresponding
-        # datasets will be created. This results in overwriting existing datasets.
-        # The current workaround is to do:
-        #   kedro catalog resolve
-        # to create a resolved catalog.yml to replace with factory datasets.
+
+        # NOTE: We need kedro >=0.19.13 to make sure catalog.list can resolve factory
+        #       datasets.
         #
-        # Issue: https://github.com/kedro-org/kedro/issues/3312
+        #       Reference : https://github.com/kedro-org/kedro/issues/3312
+
         unsatisfied = (pipeline.inputs() | pipeline.outputs()) - set(catalog.list())
         for ds_name in unsatisfied:
             catalog = catalog.shallow_copy()
