@@ -34,10 +34,17 @@ class VertexAIPipelinesRunner(SequentialRunner):
         session_id: str = None,
     ) -> Dict[str, Any]:
 
-        # NOTE: We need kedro >=0.19.13 to make sure catalog.list can resolve factory
-        #       datasets.
+        # Force the catalog to resolve factory datasets; otherwise they will be marked
+        # (wrongly) as memory dataset and the plugin will try to create the gcs-based
+        # dataset to overwrite the actual catalog.
         #
-        #       Reference : https://github.com/kedro-org/kedro/issues/3312
+        # Be aware that any memory dataset explicitly defined in catalog yaml will also
+        # cause trouble since they will no longer be considered memory dataset by this
+        # approach.
+        #
+        # Reference : https://github.com/kedro-org/kedro/issues/3312
+        for dataset in pipeline.datasets():
+            catalog.exists(dataset)  # this will refresh the catalog.list outputs
 
         unsatisfied = (pipeline.inputs() | pipeline.outputs()) - set(catalog.list())
         for ds_name in unsatisfied:
